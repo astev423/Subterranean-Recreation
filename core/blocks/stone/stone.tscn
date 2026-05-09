@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dvn4jsbibn84h"]
+
+[ext_resource type="Texture2D" uid="uid://dj2e51fro6rm2" path="res://assets/block_textures/stone.jpg" id="1_eiavn"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pyidc"]
+albedo_color = Color(0.65834004, 0.6583399, 0.6583399, 1)
+albedo_texture = ExtResource("1_eiavn")
+
+[sub_resource type="BoxMesh" id="BoxMesh_vvh5c"]
+material = SubResource("StandardMaterial3D_pyidc")
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_28aoi"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
+[node name="StoneBlock" type="MeshInstance3D" unique_id=1316384275]
+mesh = SubResource("BoxMesh_vvh5c")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1800692060]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1347225331]
+shape = SubResource("ConcavePolygonShape3D_28aoi")
