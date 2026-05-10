@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cnb85u8mdjbor"]
 
-[ext_resource type="PackedScene" uid="uid://bhw71ipy7htmw" path="res://core/planet.tscn" id="1_pq8q7"]
+[ext_resource type="PackedScene" uid="uid://bhw71ipy7htmw" path="res://core/world.tscn" id="1_pq8q7"]
 
 [node name="Root" type="Node3D" unique_id=648529368]
 

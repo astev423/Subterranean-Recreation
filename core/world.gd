@@ -22,12 +22,12 @@ func _generate_chunk(pos: Vector3i):
 	var cube_positions: Dictionary[Vector3i, int]
 
 	for x in range(pos.x, pos.x + CHUNK_SIZE.x):
-		for y in range(-CHUNK_SIZE.y, 0):
+		for y in range(-CHUNK_SIZE.y, -1):
 			for z in range(pos.z, pos.z + CHUNK_SIZE.z):
 				cube_positions[Vector3i(x, y, z)] = 1
 
-	var chunk := chunk_scene.instantiate()
-	chunk.create_surface_with_invisible_faces_hidden(cube_positions)
+	var chunk: StaticBody3D = chunk_scene.instantiate()
+	chunk.create_chunk(cube_positions)
 	add_child(chunk)
 
 func _generate_random_world(world_size: Vector3i):

@@ -14,7 +14,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotate_x(-event.relative.y * MOUSE_SENSITIVITY)
 		camera.rotation.x = clamp(camera.rotation.x, -deg_to_rad(70), deg_to_rad(70))
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	var speed := 5.0
 	#if not is_on_floor():
 	#	velocity += get_gravity() * delta
