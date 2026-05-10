@@ -18,16 +18,19 @@ func _physics_process(delta: float) -> void:
 	var speed := 5.0
 	#if not is_on_floor():
 	#	velocity += get_gravity() * delta
-	if Input.is_action_pressed("ui_accept"):
-		velocity.y = JUMP_VELOCITY
-	elif Input.is_action_pressed("ctrl"):
-		velocity.y = - JUMP_VELOCITY
-	elif Input.is_action_pressed("shift"):
+	if Input.is_action_pressed("shift"):
 		speed = 100.0
+	if Input.is_action_pressed("ui_accept"):
+		velocity.y = speed
+	elif Input.is_action_pressed("ctrl"):
+		velocity.y = - speed
 	else:
-		velocity.y = move_toward(velocity.y, 0, delta * 20)
+		velocity.y = 0
 	if Input.is_action_just_pressed("ui_cancel"):
-		get_tree().quit()
+		if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if Input.is_action_just_pressed("ui_left"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dvn4jsbibn84h"]
 
-[ext_resource type="Texture2D" uid="uid://dj2e51fro6rm2" path="res://assets/block_textures/stone.jpg" id="1_eiavn"]
+[ext_resource type="Texture2D" uid="uid://b5sdb1s3jo8mt" path="res://assets/block_textures/stone.png" id="1_eiavn"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pyidc"]
 albedo_color = Color(0.65834004, 0.6583399, 0.6583399, 1)

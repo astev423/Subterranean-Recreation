@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://b231i51jq40o0" path="res://core/player/player.tscn" id="1_bs1sv"]
 [ext_resource type="Script" uid="uid://bnfsq1cd30pyn" path="res://core/planet.gd" id="1_iakws"]
 [ext_resource type="PackedScene" uid="uid://dvn4jsbibn84h" path="res://core/blocks/stone/stone.tscn" id="2_ljlru"]
+[ext_resource type="Script" uid="uid://di0gi687mo52t" path="res://core/mesh_instance_3d.gd" id="4_ljlru"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pq8q7"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -17,12 +18,17 @@ sky = SubResource("Sky_pyidc")
 tonemap_mode = 2
 glow_enabled = true
 
+[sub_resource type="ArrayMesh" id="ArrayMesh_iux5p"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ljlru"]
+vertex_color_use_as_albedo = true
+
 [node name="Planet" type="Node3D" unique_id=1210528974]
 script = ExtResource("1_iakws")
 stone_block_scene = ExtResource("2_ljlru")
 
 [node name="CharacterBody3D" parent="." unique_id=1823418519 instance=ExtResource("1_bs1sv")]
-transform = Transform3D(-0.9991697, 0, 0.04074213, 0, 1, 0, -0.04074213, 0, -0.9991697, 27.252457, 4.068088, -19.741262)
+transform = Transform3D(-0.9991697, 0, 0.04074213, 0, 1, 0, -0.04074213, 0, -0.9991697, 0.021466255, 0.13528085, -1.7278509)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=556096243]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
@@ -30,3 +36,8 @@ shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=84090080]
 environment = SubResource("Environment_vvh5c")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1631556825]
+mesh = SubResource("ArrayMesh_iux5p")
+script = ExtResource("4_ljlru")
+mat = SubResource("StandardMaterial3D_ljlru")
