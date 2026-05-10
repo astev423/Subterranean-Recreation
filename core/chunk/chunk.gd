@@ -1,8 +1,7 @@
 extends MeshInstance3D
 
 """
-Here we define how to make a cube and then create_surface can be called with positions where we want
-to draw cubes and it will make a single surface with all of those cubes so we just need 1 draw call
+Take in cube positions then build single mesh instance for those cubes, hiding invisible faces
 """
 
 @export var mat: Material
@@ -11,7 +10,7 @@ var surface_array: Array = []
 var vertices := PackedVector3Array()
 var normals := PackedVector3Array()
 var colors := PackedColorArray()
-const cube_vertices: Array[Vector3i] = [
+var cube_vertices: Array[Vector3i] = [
 	Vector3(0, 0, 1),
 	Vector3(1, 0, 1),
 	Vector3(1, 0, 0),
@@ -47,12 +46,6 @@ var face_colors: Dictionary[Face, Color] = {
 	Face.BACK: Color.PURPLE
 }
 
-func _ready() -> void:
-	surface_array.resize(Mesh.ARRAY_MAX)
-
-# Make dictionary with all cubes at positions
-# Before drawing each face, check if cube at position that would block the face
-# If cube blocking face then don't draw that face
 func create_surface_with_invisible_faces_hidden(cube_positions: Dictionary[Vector3i, int]):
 	_create_surface(cube_positions)
 
@@ -82,9 +75,13 @@ func _add_face(face: Face, pos: Vector3i, cube_positions: Dictionary[Vector3i, i
 			colors.append(face_colors[face])
 
 func _commit_mesh():
+	surface_array.resize(Mesh.ARRAY_MAX)
+
 	surface_array[Mesh.ARRAY_VERTEX] = vertices
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_COLOR] = colors
 
-	self.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
-	self.mesh.surface_set_material(0, mat)
+	var array_mesh := ArrayMesh.new()
+	array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
+	array_mesh.surface_set_material(0, mat)
+	self.mesh = array_mesh

@@ -1,3 +1,10 @@
 [gd_scene format=3 uid="uid://cy4gt7vs4k2x6"]
 
+[ext_resource type="Script" uid="uid://btu57aj8x0or4" path="res://core/chunk/chunk.gd" id="1_xca3s"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xca3s"]
+vertex_color_use_as_albedo = true
+
 [node name="Chunk" type="MeshInstance3D" unique_id=191203217]
+script = ExtResource("1_xca3s")
+mat = SubResource("StandardMaterial3D_xca3s")

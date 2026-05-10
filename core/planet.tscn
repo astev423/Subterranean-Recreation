@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://b231i51jq40o0" path="res://core/player/player.tscn" id="1_bs1sv"]
 [ext_resource type="Script" uid="uid://bnfsq1cd30pyn" path="res://core/planet.gd" id="1_iakws"]
-[ext_resource type="Script" uid="uid://cpp1u2wt40npt" path="res://core/world_mesh.gd" id="2_f41yn"]
+[ext_resource type="PackedScene" uid="uid://cy4gt7vs4k2x6" path="res://core/chunk/chunk.tscn" id="3_iakws"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pq8q7"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -17,13 +17,9 @@ sky = SubResource("Sky_pyidc")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_f41yn"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iakws"]
-vertex_color_use_as_albedo = true
-
 [node name="Planet" type="Node3D" unique_id=1210528974]
 script = ExtResource("1_iakws")
+chunk_scene = ExtResource("3_iakws")
 
 [node name="CharacterBody3D" parent="." unique_id=1823418519 instance=ExtResource("1_bs1sv")]
 transform = Transform3D(-0.040742088, 0, -0.9991697, 0, 1, 0, 0.9991697, 0, -0.040742088, -8.4300785, 1.152, 7.525375)
@@ -34,8 +30,3 @@ shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=84090080]
 environment = SubResource("Environment_vvh5c")
-
-[node name="WorldMesh" type="MeshInstance3D" parent="." unique_id=1631556825]
-mesh = SubResource("ArrayMesh_f41yn")
-script = ExtResource("2_f41yn")
-mat = SubResource("StandardMaterial3D_iakws")
