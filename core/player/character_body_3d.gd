@@ -32,7 +32,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if Input.is_action_just_pressed("ui_left"):
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		get_tree().quit()
 
 	var input_dir := Input.get_vector("a", "d", "w", "s")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
