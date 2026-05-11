@@ -34,18 +34,7 @@ func _process(_delta: float) -> void:
 	cur_active_chunk_pos = Vector3i(player_x_to_chunk_x_pos, 0, player_z_to_chunk_z_pos)
 
 	if cur_active_chunk_pos != prev_active_chunk_pos:
-		if cur_active_chunk_pos.x < prev_active_chunk_pos.x:
-			var new_visible_chunks: Array[Vector3i]
-			new_visible_chunks.append(Vector3i(cur_active_chunk_pos.x - CHUNK_SIZE.x, 0, cur_active_chunk_pos.z))
-			new_visible_chunks.append(Vector3i(cur_active_chunk_pos.x - CHUNK_SIZE.x, 0, cur_active_chunk_pos.z + CHUNK_SIZE.z))
-			new_visible_chunks.append(Vector3i(cur_active_chunk_pos.x - CHUNK_SIZE.x, 0, cur_active_chunk_pos.z - CHUNK_SIZE.z))
-			_try_instantiating_chunks(new_visible_chunks)
-		elif cur_active_chunk_pos.x < prev_active_chunk_pos.x:
-			pass
-		elif cur_active_chunk_pos.x < prev_active_chunk_pos.x:
-			pass
-		elif cur_active_chunk_pos.x < prev_active_chunk_pos.x:
-			pass
+		_try_instantiating_chunks(_get_chunk_positions_around_player())
 
 	prev_active_chunk_pos = cur_active_chunk_pos
 
@@ -73,9 +62,6 @@ func _try_instantiating_chunks(chunk_positions: Array[Vector3i]):
 			continue
 
 		chunks_to_make.append(chunk_pos)
-
-	if not chunks_to_make.is_empty():
-		print("making new chunk/s")
 
 	@warning_ignore("integer_division")
 	var num_chunks_per_thread := chunks_to_make.size() / NUM_GENERATOR_THREADS
