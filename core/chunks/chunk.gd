@@ -57,7 +57,15 @@ func create_chunk(pos: Vector3i, perlin_noise_generator: FastNoiseLite):
 	for x in range(pos.x, pos.x + CHUNK_SIZE.x):
 		for z in range(pos.z, pos.z + CHUNK_SIZE.z):
 			var height := int(perlin_noise_generator.get_noise_2d(x, z) * 50.0)
-			for y in range(-CHUNK_SIZE.y, height):
+			if height > 30:
+				if randi() % 2 == 0:
+					@warning_ignore("narrowing_conversion")
+					height *= 1.3
+				else:
+					height *= 2
+			elif height <= 0:
+				height = 1
+			for y in range(0, height):
 				cube_positions[Vector3i(x, y, z)] = 1
 
 	var surface_array := _create_surface_array(cube_positions)

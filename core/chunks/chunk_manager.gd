@@ -3,7 +3,7 @@ extends Node
 @export var chunk_scene: PackedScene
 # Render distance is the length (and width since they're equal) of square of chunks to render
 @export_range(3, 128)
-var render_distance: int = 3
+var render_distance: int = 5
 
 @onready var player: CharacterBody3D = get_parent().get_node("Player")
 
@@ -34,6 +34,7 @@ func _process(_delta: float) -> void:
 	cur_active_chunk_pos = Vector3i(player_x_to_chunk_x_pos, 0, player_z_to_chunk_z_pos)
 
 	if cur_active_chunk_pos != prev_active_chunk_pos:
+		print("instantiatginsg")
 		_try_instantiating_chunks(_get_chunk_positions_around_player())
 
 	prev_active_chunk_pos = cur_active_chunk_pos
@@ -64,20 +65,27 @@ func _try_instantiating_chunks(chunk_positions: Array[Vector3i]):
 		chunks_to_make.append(chunk_pos)
 
 	@warning_ignore("integer_division")
-	var num_chunks_per_thread := chunks_to_make.size() / NUM_GENERATOR_THREADS
+	var div_result := chunks_to_make.size() / NUM_GENERATOR_THREADS
+	var remainder := chunks_to_make.size() % NUM_GENERATOR_THREADS
+	var num_chunks_per_thread: Array[int]
+
+	for i in range(NUM_GENERATOR_THREADS):
+		var num_chunks_to_instantiate = div_result
+		if remainder > 0:
+			num_chunks_to_instantiate += 1
+			remainder -= 1
+		
+		num_chunks_per_thread.append(num_chunks_to_instantiate)
+
 	var chunks_to_make_index := 0
 
 	for thread_num in range(NUM_GENERATOR_THREADS):
-		var slice_size := num_chunks_per_thread
+		var slice_size := num_chunks_per_thread[thread_num]
 		var thread = Thread.new()
 
-		if thread_num == NUM_GENERATOR_THREADS - 1:
-			thread.start(_instantiate_chunks.bind(chunks_to_make.slice(chunks_to_make_index, chunks_to_make_index + num_chunks_per_thread + chunks_to_make.size() % NUM_GENERATOR_THREADS)))
-			slice_size += chunks_to_make.size() % NUM_GENERATOR_THREADS
-		else:
-			thread.start(_instantiate_chunks.bind(chunks_to_make.slice(chunks_to_make_index, chunks_to_make_index + num_chunks_per_thread)))
-		
+		thread.start(_instantiate_chunks.bind(chunks_to_make.slice(chunks_to_make_index, chunks_to_make_index + num_chunks_per_thread[thread_num])))
 		threads.append(thread)
+
 		chunks_to_make_index += slice_size
 
 func _instantiate_chunks(chunk_positions: Array[Vector3i]):
