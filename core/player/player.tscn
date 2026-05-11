@@ -4,11 +4,10 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_pyidc"]
 
-[node name="CharacterBody3D" type="CharacterBody3D" unique_id=1823418519]
+[node name="Player" type="CharacterBody3D" unique_id=1823418519]
 script = ExtResource("1_bq184")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=823348343]
-far = 400.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=382062014]
 shape = SubResource("SphereShape3D_pyidc")
