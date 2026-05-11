@@ -31,7 +31,7 @@ func _physics_process(_delta: float) -> void:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if Input.is_action_just_pressed("ui_left"):
+	if Input.is_action_just_pressed("ui_text_delete"):
 		get_tree().quit()
 
 	var input_dir := Input.get_vector("a", "d", "w", "s")
