@@ -5,6 +5,8 @@ const MOUSE_SENSITIVITY = 0.003
 
 @onready var camera: Camera3D = $Camera3D
 
+var is_flying := true
+
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
@@ -14,24 +16,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera.rotate_x(-event.relative.y * MOUSE_SENSITIVITY)
 		camera.rotation.x = clamp(camera.rotation.x, -deg_to_rad(70), deg_to_rad(70))
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var speed := 5.0
-	#if not is_on_floor():
-	#	velocity += get_gravity() * delta
+	if Input.is_action_just_pressed("f"):
+		is_flying = false
+
+	if not is_on_floor() and not is_flying:
+		if velocity.y > 10:
+			velocity.y = 0
+
+		velocity += get_gravity() * delta
+		print(velocity)
+
 	if Input.is_action_pressed("shift"):
 		speed = 100.0
+
 	if Input.is_action_pressed("ui_accept"):
 		velocity.y = speed
 	elif Input.is_action_pressed("ctrl"):
 		velocity.y = - speed
-	else:
+	elif is_flying:
 		velocity.y = 0
+
 	if Input.is_action_just_pressed("ui_cancel"):
 		if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if Input.is_action_just_pressed("ui_text_delete"):
+	elif Input.is_action_just_pressed("ui_text_delete"):
 		get_tree().quit()
 
 	var input_dir := Input.get_vector("a", "d", "w", "s")

@@ -19,7 +19,7 @@ glow_enabled = true
 [node name="World" type="Node3D" unique_id=1210528974]
 
 [node name="Player" parent="." unique_id=1823418519 instance=ExtResource("3_wd0q5")]
-transform = Transform3D(-0.040742088, 0, -0.9991697, 0, 1, 0, 0.9991697, 0, -0.040742088, 16, 20, 16)
+transform = Transform3D(0.9991697, 0, -0.040742043, 0, 1, 0, 0.040742043, 0, 0.9991697, 16, 50, 16)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=556096243]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 0)
