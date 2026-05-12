@@ -12,14 +12,14 @@ var vertices := PackedVector3Array()
 var normals := PackedVector3Array()
 var colors := PackedColorArray()
 var cube_vertices: Array[Vector3i] = [
-	Vector3(0, 0, 1),
-	Vector3(1, 0, 1),
-	Vector3(1, 0, 0),
-	Vector3(0, 0, 0),
-	Vector3(0, 1, 1),
-	Vector3(1, 1, 1),
-	Vector3(1, 1, 0),
-	Vector3(0, 1, 0)
+	Vector3i(0, 0, 1),
+	Vector3i(1, 0, 1),
+	Vector3i(1, 0, 0),
+	Vector3i(0, 0, 0),
+	Vector3i(0, 1, 1),
+	Vector3i(1, 1, 1),
+	Vector3i(1, 1, 0),
+	Vector3i(0, 1, 0)
 ]
 var face_indices: Dictionary[Face, Array] = {
 	Face.FRONT: [[0, 4, 5], [0, 5, 1]],
@@ -30,12 +30,12 @@ var face_indices: Dictionary[Face, Array] = {
 	Face.TOP: [[4, 7, 6], [4, 6, 5]]
 }
 var face_normals: Dictionary[Face, Vector3i] = {
-	Face.FRONT: Vector3(0, 0, 1),
-	Face.BACK: Vector3(0, 0, -1),
-	Face.LEFT: Vector3(-1, 0, 0),
-	Face.RIGHT: Vector3(1, 0, 0),
-	Face.BOTTOM: Vector3(0, -1, 0),
-	Face.TOP: Vector3(0, 1, 0)
+	Face.FRONT: Vector3i(0, 0, 1),
+	Face.BACK: Vector3i(0, 0, -1),
+	Face.LEFT: Vector3i(-1, 0, 0),
+	Face.RIGHT: Vector3i(1, 0, 0),
+	Face.BOTTOM: Vector3i(0, -1, 0),
+	Face.TOP: Vector3i(0, 1, 0)
 }
 var face_colors: Dictionary[Face, Color] = {
 	Face.BOTTOM: Color.RED,
@@ -53,7 +53,7 @@ func create_chunk(spawn_pos: Vector3i, noise: FastNoiseLite):
 	colors.clear()
 
 	var cube_positions = _get_chunk_cube_positions(spawn_pos, noise)
-	var surface_array := _create_chunk_surface_array(cube_positions)
+	var surface_array := _create_chunk_surface_array(cube_positions, noise)
 	_add_mesh_and_collision_to_chunk(surface_array)
 
 func _get_chunk_cube_positions(chunk_spawn_pos: Vector3i, noise: FastNoiseLite) -> Dictionary[Vector3i, int]:
@@ -62,25 +62,19 @@ func _get_chunk_cube_positions(chunk_spawn_pos: Vector3i, noise: FastNoiseLite) 
 	for x in range(chunk_spawn_pos.x, chunk_spawn_pos.x + CHUNK_SIZE.x):
 		for z in range(chunk_spawn_pos.z, chunk_spawn_pos.z + CHUNK_SIZE.z):
 			var height: int = max(1, int(noise.get_noise_2d(x, z) * 50.0))
-			if height > 30:
-				if randi() % 2 == 0:
-					@warning_ignore("narrowing_conversion")
-					height *= 1.3
-				else:
-					height *= 2
-
 			for y in range(0, height):
 				cube_positions[Vector3i(x, y, z)] = 1
 
 	return cube_positions
 
 
-func _create_chunk_surface_array(cube_positions: Dictionary[Vector3i, int]) -> Array:
+func _create_chunk_surface_array(cube_positions: Dictionary[Vector3i, int], noise: FastNoiseLite) -> Array:
 	for pos in cube_positions:
 		for face in Face.values():
-			# We only want to add the face if it has no neighbors, pos + normal is pos of neighbor cube
 			var neighbor_pos := pos + face_normals[face]
-			if neighbor_pos in cube_positions:
+			var neighbor_col_max_height: int = max(1, int(noise.get_noise_2d(neighbor_pos.x, neighbor_pos.z) * 50.0)) - 1
+			# Don't add face to be rendered if has neighbor in chunk or other chunk column blocking the face
+			if neighbor_pos in cube_positions or ((neighbor_pos.x != pos.x or neighbor_pos.z != pos.z) and pos.y <= neighbor_col_max_height):
 				continue
 
 			_add_face(face, pos)

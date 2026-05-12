@@ -26,7 +26,6 @@ func _physics_process(delta: float) -> void:
 			velocity.y = 0
 
 		velocity += get_gravity() * delta
-		print(velocity)
 
 	if Input.is_action_pressed("shift"):
 		speed = 100.0
