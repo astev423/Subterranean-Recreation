@@ -46,39 +46,44 @@ var face_colors: Dictionary[Face, Color] = {
 	Face.BACK: Color.PURPLE
 }
 
-func create_chunk(pos: Vector3i, perlin_noise_generator: FastNoiseLite):
+func create_chunk(spawn_pos: Vector3i, noise: FastNoiseLite):
 	# Clear chunk in case called twice for memory and rendering savings
 	vertices.clear()
 	normals.clear()
 	colors.clear()
 
+	var cube_positions = _get_chunk_cube_positions(spawn_pos, noise)
+	var surface_array := _create_chunk_surface_array(cube_positions)
+	_add_mesh_and_collision_to_chunk(surface_array)
+
+func _get_chunk_cube_positions(chunk_spawn_pos: Vector3i, noise: FastNoiseLite) -> Dictionary[Vector3i, int]:
 	var cube_positions: Dictionary[Vector3i, int] = {}
 
-	for x in range(pos.x, pos.x + CHUNK_SIZE.x):
-		for z in range(pos.z, pos.z + CHUNK_SIZE.z):
-			var height := int(perlin_noise_generator.get_noise_2d(x, z) * 50.0)
+	for x in range(chunk_spawn_pos.x, chunk_spawn_pos.x + CHUNK_SIZE.x):
+		for z in range(chunk_spawn_pos.z, chunk_spawn_pos.z + CHUNK_SIZE.z):
+			var height: int = max(1, int(noise.get_noise_2d(x, z) * 50.0))
 			if height > 30:
 				if randi() % 2 == 0:
 					@warning_ignore("narrowing_conversion")
 					height *= 1.3
 				else:
 					height *= 2
-			elif height <= 0:
-				height = 1
+
 			for y in range(0, height):
 				cube_positions[Vector3i(x, y, z)] = 1
 
-	var surface_array := _create_surface_array(cube_positions)
-	_add_mesh_and_collision_to_chunk(surface_array)
+	return cube_positions
 
-func _create_surface_array(cube_positions: Dictionary[Vector3i, int]) -> Array:
+
+func _create_chunk_surface_array(cube_positions: Dictionary[Vector3i, int]) -> Array:
 	for pos in cube_positions:
-		_add_face(Face.FRONT, pos, cube_positions)
-		_add_face(Face.BACK, pos, cube_positions)
-		_add_face(Face.LEFT, pos, cube_positions)
-		_add_face(Face.RIGHT, pos, cube_positions)
-		_add_face(Face.TOP, pos, cube_positions)
-		_add_face(Face.BOTTOM, pos, cube_positions)
+		for face in Face.values():
+			# We only want to add the face if it has no neighbors, pos + normal is pos of neighbor cube
+			var neighbor_pos := pos + face_normals[face]
+			if neighbor_pos in cube_positions:
+				continue
+
+			_add_face(face, pos)
 
 	var surface_array := []
 	surface_array.resize(Mesh.ARRAY_MAX)
@@ -89,9 +94,9 @@ func _create_surface_array(cube_positions: Dictionary[Vector3i, int]) -> Array:
 	return surface_array
 
 func _add_mesh_and_collision_to_chunk(surface_array: Array):
-	var mesh_instance := MeshInstance3D.new()
 	var array_mesh := ArrayMesh.new()
 	array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
+	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.mesh = array_mesh
 	var material := StandardMaterial3D.new()
 	material.vertex_color_use_as_albedo = true
@@ -105,12 +110,7 @@ func _add_mesh_and_collision_to_chunk(surface_array: Array):
 
 # Here we duplicate vertex data but thats needed as each vertex has different normal and color 
 # depending on the face
-func _add_face(face: Face, pos: Vector3i, cube_positions: Dictionary[Vector3i, int]):
-	# We only want to add the face if it has no neighbors, pos + normal is pos of neighbor cube
-	var neighbor_pos := pos + face_normals[face]
-	if neighbor_pos in cube_positions:
-		return
-
+func _add_face(face: Face, pos: Vector3i):
 	var indices := face_indices[face]
 	for triangle in indices:
 		for index in triangle:

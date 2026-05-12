@@ -31,7 +31,7 @@ environment = SubResource("Environment_vvh5c")
 
 [node name="ChunkManager" parent="." unique_id=855679421 instance=ExtResource("4_e68cy")]
 
-[node name="Label" type="Label" parent="." unique_id=1676876708]
+[node name="RenderingInfo" type="Label" parent="." unique_id=1676876708]
 offset_right = 40.0
 offset_bottom = 23.0
 script = ExtResource("3_ccd7m")

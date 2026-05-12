@@ -11,8 +11,7 @@ var render_distance: int = 5
 const CHUNK_SIZE := Vector3i(32, 16, 32)
 
 var NUM_GENERATOR_THREADS: int = max(1, OS.get_processor_count() - 1)
-var threads: Array[Thread] = []
-var perlin_noise_generator := FastNoiseLite.new()
+var noise := FastNoiseLite.new()
 var prev_active_chunk_pos := Vector3i(0, 0, 0)
 var cur_active_chunk_pos := Vector3i(0, 0, 0)
 var chunks_instantiated: Dictionary[Vector3i, int] = {}
@@ -21,23 +20,34 @@ func _ready():
 	var camera: Camera3D = player.get_node("Camera3D")
 	camera.far = render_distance * CHUNK_SIZE.x
 
-	perlin_noise_generator.noise_type = FastNoiseLite.TYPE_SIMPLEX
-	perlin_noise_generator.seed = randi()
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	noise.seed = randi()
 
 	_try_instantiating_chunks(_get_chunk_positions_around_player())
 
 	
 # Check if we need to instantiate new chunks
 func _process(_delta: float) -> void:
-	var player_x_to_chunk_x_pos: int = int(player.position.x / CHUNK_SIZE.x) * CHUNK_SIZE.x if player.position.x > 0 else int((player.position.x - 32) / CHUNK_SIZE.x) * CHUNK_SIZE.x
-	var player_z_to_chunk_z_pos: int = int(player.position.z / CHUNK_SIZE.z) * CHUNK_SIZE.z if player.position.z > 0 else int((player.position.z - 32) / CHUNK_SIZE.z) * CHUNK_SIZE.z
+	var player_x_to_chunk_x_pos := int(player.position.x / CHUNK_SIZE.x) * CHUNK_SIZE.x if player.position.x > 0 else int((player.position.x - 32) / CHUNK_SIZE.x) * CHUNK_SIZE.x
+	var player_z_to_chunk_z_pos := int(player.position.z / CHUNK_SIZE.z) * CHUNK_SIZE.z if player.position.z > 0 else int((player.position.z - 32) / CHUNK_SIZE.z) * CHUNK_SIZE.z
 	cur_active_chunk_pos = Vector3i(player_x_to_chunk_x_pos, 0, player_z_to_chunk_z_pos)
 
 	if cur_active_chunk_pos != prev_active_chunk_pos:
-		print("instantiatginsg")
 		_try_instantiating_chunks(_get_chunk_positions_around_player())
 
 	prev_active_chunk_pos = cur_active_chunk_pos
+
+func _try_instantiating_chunks(chunk_positions: Array[Vector3i]):
+	var chunks_to_make: Array[Vector3i] = []
+
+	for pos in chunk_positions:
+		if chunks_instantiated.has(pos):
+			continue
+
+		chunks_instantiated[pos] = 1
+		chunks_to_make.append(pos)
+
+	WorkerThreadPool.add_group_task(_instantiate_chunks.bind(chunks_to_make), chunks_to_make.size())
 
 func _get_chunk_positions_around_player() -> Array[Vector3i]:
 # Here we treat each chunk as discrete grid component, such as chunk 1 = (0, 0) and chunk 2 = (0, 1)
@@ -55,25 +65,9 @@ func _get_chunk_positions_around_player() -> Array[Vector3i]:
 
 	return chunk_positions
 
-func _try_instantiating_chunks(chunk_positions: Array[Vector3i]):
-	var chunks_to_make: Array[Vector3i] = []
-
-	for chunk_pos in chunk_positions:
-		if chunks_instantiated.has(chunk_pos):
-			continue
-
-		chunks_instantiated[chunk_pos] = 1
-		chunks_to_make.append(chunk_pos)
-
-	WorkerThreadPool.add_group_task(_instantiate_chunks.bind(chunks_to_make), chunks_to_make.size())
-
 func _instantiate_chunks(index: int, chunks: Array[Vector3i]):
 	var chunk: StaticBody3D = chunk_scene.instantiate()
 	var chunk_pos := chunks[index]
-	chunk.create_chunk(chunk_pos, perlin_noise_generator)
+	chunk.create_chunk(chunk_pos, noise)
 	# Must defer the adding child to be thread safe
 	add_child.call_deferred(chunk)
-
-func _exit_tree() -> void:
-	for thread in threads:
-		thread.wait_to_finish()
