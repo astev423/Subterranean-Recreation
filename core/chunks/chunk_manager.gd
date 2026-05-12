@@ -62,39 +62,17 @@ func _try_instantiating_chunks(chunk_positions: Array[Vector3i]):
 		if chunks_instantiated.has(chunk_pos):
 			continue
 
+		chunks_instantiated[chunk_pos] = 1
 		chunks_to_make.append(chunk_pos)
 
-	@warning_ignore("integer_division")
-	var div_result := chunks_to_make.size() / NUM_GENERATOR_THREADS
-	var remainder := chunks_to_make.size() % NUM_GENERATOR_THREADS
-	var num_chunks_per_thread: Array[int]
+	WorkerThreadPool.add_group_task(_instantiate_chunks.bind(chunks_to_make), chunks_to_make.size())
 
-	for i in range(NUM_GENERATOR_THREADS):
-		var num_chunks_to_instantiate = div_result
-		if remainder > 0:
-			num_chunks_to_instantiate += 1
-			remainder -= 1
-		
-		num_chunks_per_thread.append(num_chunks_to_instantiate)
-
-	var chunks_to_make_index := 0
-
-	for thread_num in range(NUM_GENERATOR_THREADS):
-		var slice_size := num_chunks_per_thread[thread_num]
-		var thread = Thread.new()
-
-		thread.start(_instantiate_chunks.bind(chunks_to_make.slice(chunks_to_make_index, chunks_to_make_index + num_chunks_per_thread[thread_num])))
-		threads.append(thread)
-
-		chunks_to_make_index += slice_size
-
-func _instantiate_chunks(chunk_positions: Array[Vector3i]):
-	for chunk_pos in chunk_positions:
-		var chunk: StaticBody3D = chunk_scene.instantiate()
-		chunk.create_chunk(chunk_pos, perlin_noise_generator)
-		# Must defer the adding child to be thread safe
-		add_child.call_deferred(chunk)
-		chunks_instantiated[chunk_pos] = 1
+func _instantiate_chunks(index: int, chunks: Array[Vector3i]):
+	var chunk: StaticBody3D = chunk_scene.instantiate()
+	var chunk_pos := chunks[index]
+	chunk.create_chunk(chunk_pos, perlin_noise_generator)
+	# Must defer the adding child to be thread safe
+	add_child.call_deferred(chunk)
 
 func _exit_tree() -> void:
 	for thread in threads:
