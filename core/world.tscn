@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://bhw71ipy7htmw"]
 
+[ext_resource type="Script" uid="uid://cygrfe1l42pwu" path="res://core/label.gd" id="3_ccd7m"]
 [ext_resource type="PackedScene" uid="uid://b231i51jq40o0" path="res://core/player/player.tscn" id="3_wd0q5"]
 [ext_resource type="PackedScene" uid="uid://d2xwc0m5l0if2" path="res://core/chunks/chunk_manager.tscn" id="4_e68cy"]
 
@@ -29,3 +30,8 @@ shadow_enabled = true
 environment = SubResource("Environment_vvh5c")
 
 [node name="ChunkManager" parent="." unique_id=855679421 instance=ExtResource("4_e68cy")]
+
+[node name="Label" type="Label" parent="." unique_id=1676876708]
+offset_right = 40.0
+offset_bottom = 23.0
+script = ExtResource("3_ccd7m")
