@@ -3,9 +3,10 @@ extends Node
 @export var chunk_scene: PackedScene
 # Render distance is the length (and width since they're equal) of square of chunks to render
 @export_range(3, 128)
-var render_distance: int = 5
+var render_distance: int = 70
 
 @onready var player: CharacterBody3D = get_parent().get_node("Player")
+@onready var cur_player_pos := player.global_position
 
 # Chunks start drawing at their position then go position 32 x and z, so chunk -32, 0, -32 goes to 0, 0, 0
 const CHUNK_SIZE := Vector3i(32, 16, 32)
@@ -28,6 +29,7 @@ func _ready():
 	
 # Check if we need to instantiate new chunks
 func _process(_delta: float) -> void:
+	cur_player_pos = player.global_position
 	var player_x_to_chunk_x_pos := int(player.position.x / CHUNK_SIZE.x) * CHUNK_SIZE.x if player.position.x > 0 else int((player.position.x - 32) / CHUNK_SIZE.x) * CHUNK_SIZE.x
 	var player_z_to_chunk_z_pos := int(player.position.z / CHUNK_SIZE.z) * CHUNK_SIZE.z if player.position.z > 0 else int((player.position.z - 32) / CHUNK_SIZE.z) * CHUNK_SIZE.z
 	cur_active_chunk_pos = Vector3i(player_x_to_chunk_x_pos, 0, player_z_to_chunk_z_pos)
@@ -68,6 +70,6 @@ func _get_chunk_positions_around_player() -> Array[Vector3i]:
 func _instantiate_chunks(index: int, chunks: Array[Vector3i]):
 	var chunk: StaticBody3D = chunk_scene.instantiate()
 	var chunk_pos := chunks[index]
-	chunk.create_chunk(chunk_pos, noise)
+	chunk.create_chunk(chunk_pos, noise, cur_player_pos)
 	# Must defer the adding child to be thread safe
 	add_child.call_deferred(chunk)
