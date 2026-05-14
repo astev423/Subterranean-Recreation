@@ -73,6 +73,7 @@ var flat_terrain_face_normals: Dictionary[Face, Vector3i] = {
 }
 
 func create_chunk(spawn_pos: Vector3i, noise: FastNoiseLite, player_pos: Vector3):
+	# This LOD feature is what is causing problems. maybe I need to make the mesh and other stuff in main thread?
 	if player_pos.distance_to(spawn_pos) > 200:
 		for face in Face.values():
 			var indices := flat_terrain_face_indices[face]
